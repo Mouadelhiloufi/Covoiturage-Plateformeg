@@ -1,6 +1,7 @@
-package com.covoiturage.entity;
+package com.youcode.covoiturage.entity;
 
 import com.youcode.covoiturage.entity.Conducteur;
+import com.youcode.covoiturage.entity.Trajet;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,8 +44,8 @@ public class Vehicule {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "conducteur_id", nullable = false)
     private Conducteur conducteur;
-
-    @OneToMany(mappedBy = "vehicule")
-    @Builder.Default
-    private List<Trajet> trajets=new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "vehicule")
+//    @Builder.Default
+//    private List<Trajet> trajets=new ArrayList<>();
 }
