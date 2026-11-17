@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CollectionId;
 import org.hibernate.engine.internal.Cascade;
 import org.springframework.stereotype.Service;
+import com.covoiturage.entity.Vehicule;
 
 import java.util.ArrayList;
 import java.util.List;
