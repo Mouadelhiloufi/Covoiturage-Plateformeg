@@ -1,73 +1,78 @@
 # Covoiturage
 
-Application de covoiturage développée avec **Spring Boot** et **Java 17**.
+API REST de covoiturage développée avec **Java 17** et **Spring Boot 3.4.3**.
+L’application permet de gérer les conducteurs, passagers, véhicules, trajets,
+points d’arrêt et réservations.
 
-Le projet constitue actuellement le socle de l’application : configuration Spring Boot, accès aux données avec JPA, validation des données et exposition de services Web MVC.
-
-## Technologies utilisées
+## Technologies
 
 - Java 17
-- Spring Boot 4.1.2
-- Spring Web MVC
-- Spring Data JPA
+- Spring Boot 3.4.3
+- Spring Web
+- Spring Data JPA / Hibernate
 - Bean Validation
-- PostgreSQL
-- Maven
-- Lombok
-- MapStruct
-- JUnit 5
+- PostgreSQL 16
+- Maven Wrapper
+- Lombok et MapStruct
+- JUnit 5 / Mockito
 
 ## Prérequis
 
-Avant de lancer le projet, assurez-vous d’avoir installé :
+- JDK 17 ou version supérieure compatible ;
+- Docker et Docker Compose (recommandé pour PostgreSQL) ;
+- Git.
 
-- Java 17 ou une version compatible ;
-- PostgreSQL si la connexion à une base de données est nécessaire ;
-- Git, pour récupérer le projet.
-
-Le projet inclut le **Maven Wrapper** : une installation globale de Maven n’est donc pas obligatoire.
+Une installation globale de Maven n’est pas nécessaire : le projet fournit
+le Maven Wrapper.
 
 ## Installation
-
-Clonez le dépôt puis placez-vous dans son répertoire :
 
 ```bash
 git clone <url-du-depot>
 cd Covoiturage
 ```
 
+### Démarrer PostgreSQL avec Docker
+
+Le fichier `docker-compose.yml` démarre une instance PostgreSQL 16 avec les
+paramètres utilisés par l’application :
+
+```bash
+docker compose up -d
+```
+
+| Paramètre | Valeur |
+|---|---|
+| Base de données | `covoiturage_db` |
+| Utilisateur | `postgres` |
+| Mot de passe | `password` |
+| Port hôte | `5435` |
+
+Pour arrêter le conteneur :
+
+```bash
+docker compose down
+```
+
 ## Configuration
 
-La configuration principale se trouve dans :
-
-```text
-src/main/resources/application.yaml
-```
-
-La configuration actuelle définit le nom de l’application :
+La configuration se trouve dans
+`src/main/resources/application.yaml`. Par défaut, l’API utilise :
 
 ```yaml
-spring:
-  application:
-    name: Covoiturage
-```
-
-Si une base PostgreSQL est utilisée, ajoutez les propriétés de connexion adaptées à votre environnement dans `application.yaml` ou dans un fichier de configuration local non versionné.
-
-Exemple :
-
-```yaml
+server:
+  port: 8087
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/covoiturage
-    username: votre_utilisateur
-    password: votre_mot_de_passe
-  jpa:
-    hibernate:
-      ddl-auto: update
+    url: jdbc:postgresql://localhost:5435/covoiturage_db
+    username: postgres
+    password: password
 ```
 
-## Lancement de l’application
+Adaptez ces valeurs à votre environnement. Hibernate utilise actuellement
+`ddl-auto: update` et crée ou met à jour automatiquement les tables.
+
+## Lancer l’application
 
 Sous Windows :
 
@@ -81,53 +86,76 @@ Sous Linux ou macOS :
 ./mvnw spring-boot:run
 ```
 
-L’application démarre sur le port `8080` par défaut.
+L’API est disponible à l’adresse <http://localhost:8087>.
+
+## API disponible
+
+Toutes les routes sont préfixées par `/api`.
+
+| Ressource | Opérations principales |
+|---|---|
+| `/conducteurs` | créer, consulter, modifier, lister et rechercher (`?q=`) |
+| `/passagers` | créer, consulter, modifier, lister et rechercher (`?q=`) |
+| `/vehicules` | créer, consulter par conducteur, modifier et supprimer |
+| `/trajets` | publier, consulter, rechercher, terminer et annuler |
+| `/reservations` | réserver, annuler et lister par passager |
+
+Les listes paginées acceptent les paramètres Spring Data `page`, `size` et
+`sort`. La recherche de trajets accepte `villeDepart`, `villeArrivee`,
+`date`, ainsi que les paramètres optionnels `prixMax` et `nbPlaces`.
+
+## Tester avec Postman
+
+Les fichiers suivants sont fournis à la racine du projet :
+
+- `Covoiturage.postman_collection.json` : collection des requêtes REST ;
+- `Covoiturage.postman_environment.json` : environnement local avec
+  `baseUrl=http://localhost:8087`.
+
+Importez les deux fichiers dans Postman après avoir démarré PostgreSQL et
+l’application.
 
 ## Compilation et tests
 
-Pour compiler le projet :
+Compiler et empaqueter le projet :
 
 ```powershell
 .\mvnw.cmd clean package
 ```
 
-Pour exécuter les tests :
+Exécuter les tests :
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-Le test actuel vérifie que le contexte Spring Boot se charge correctement.
+Les tests couvrent notamment le chargement du contexte Spring et les règles
+des services de trajets et de réservations.
 
 ## Structure du projet
 
 ```text
 Covoiturage/
-├── src/
-│   ├── main/
-│   │   ├── java/com/youcode/covoiturage/
-│   │   │   └── CovoiturageApplication.java
-│   │   └── resources/
-│   │       └── application.yaml
-│   └── test/
-│       └── java/com/youcode/covoiturage/
-│           └── CovoiturageApplicationTests.java
+├── src/main/java/com/youcode/covoiturage/
+│   ├── controller/       # Contrôleurs REST
+│   ├── dto/              # Objets d’entrée et de sortie
+│   ├── entity/           # Entités JPA
+│   ├── mapper/           # Mappers MapStruct
+│   ├── repository/       # Repositories Spring Data
+│   ├── service/          # Services métier
+│   └── exception/        # Exceptions et gestion globale
+├── src/test/             # Tests unitaires et d’intégration
+├── docker-compose.yml
 ├── pom.xml
 ├── mvnw
 └── mvnw.cmd
 ```
 
-## Point d’entrée
-
-La classe principale de l’application est :
-
-```text
-com.youcode.covoiturage.CovoiturageApplication
-```
-
 ## État du projet
 
-Les fonctionnalités métier du covoiturage, telles que la gestion des utilisateurs, des trajets, des réservations et des paiements, restent à implémenter.
+Le socle REST et les principales fonctionnalités métier sont implémentés.
+L’authentification, l’autorisation et le paiement ne sont pas encore
+intégrés.
 
 ## Licence
 
