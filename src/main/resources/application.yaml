@@ -1,8 +1,16 @@
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  port: 8087
 spring:
   application:
     name: covoiturage-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/covoiturage_db
+    url: jdbc:postgresql://localhost:5435/covoiturage_db
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
@@ -14,3 +22,4 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
