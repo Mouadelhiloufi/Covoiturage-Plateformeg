@@ -1,99 +1,42 @@
 {
   "info": {
     "name": "Covoiturage API",
-    "description": "Collection Postman pour tester l'API Spring Boot de covoiturage.\n\nBase URL locale: http://localhost:8087\n\nOrdre conseille:\n1. Creer un conducteur\n2. Creer un passager\n3. Creer un vehicule avec l'identifiant du conducteur\n4. Tester les routes GET, PUT, SEARCH et DELETE",
+    "description": "Collection Postman locale complete. Base URL: http://localhost:8087",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8087" },
     { "key": "conducteurId", "value": "1" },
     { "key": "passagerId", "value": "1" },
-    { "key": "vehiculeId", "value": "1" }
+    { "key": "vehiculeId", "value": "2" },
+    { "key": "trajetId", "value": "1" },
+    { "key": "reservationId", "value": "1" },
+    { "key": "pointMonteeId", "value": "1" },
+    { "key": "pointDescenteId", "value": "3" }
   ],
   "item": [
     {
       "name": "Conducteurs",
-      "description": "Gestion des conducteurs.",
       "item": [
         {
-          "name": "Creer un conducteur",
+          "name": "Creer",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nom\": \"El Hiloufi\",\n  \"prenom\": \"Mouad\",\n  \"email\": \"mouad.elhiloufi@example.com\",\n  \"telephone\": \"0600000001\",\n  \"numeroPermis\": \"PERMIS-001\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"El Hiloufi\",\n  \"prenom\": \"Mouad\",\n  \"email\": \"mouad.elhiloufi@example.com\",\n  \"telephone\": \"0600000001\",\n  \"numeroPermis\": \"PERMIS-001\"\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/conducteurs"
           },
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test(\"Code HTTP 201\", function () { pm.response.to.have.status(201); });",
-                "const body = pm.response.json();",
-                "pm.collectionVariables.set(\"conducteurId\", body.id);"
-              ]
-            }
-          }]
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if (r.id) pm.collectionVariables.set(\"conducteurId\", r.id);"] } }]
         },
+        { "name": "Lister", "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs?page=0&size=10&sort=nom,asc" } },
+        { "name": "Obtenir", "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/{{conducteurId}}" } },
+        { "name": "Rechercher", "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/search?q=Mouad&page=0&size=10" } },
         {
-          "name": "Lister les conducteurs",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/conducteurs?page=0&size=10&sort=nom,asc",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "conducteurs"],
-              "query": [
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "sort", "value": "nom,asc" }
-              ]
-            }
-          },
-          "event": [{
-            "listen": "test",
-            "script": { "exec": ["pm.test(\"Code HTTP 200\", function () { pm.response.to.have.status(200); });"] }
-          }]
-        },
-        {
-          "name": "Obtenir un conducteur",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/conducteurs/{{conducteurId}}"
-          }
-        },
-        {
-          "name": "Rechercher des conducteurs",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/conducteurs/search?q=Mouad&page=0&size=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "conducteurs", "search"],
-              "query": [
-                { "key": "q", "value": "Mouad" },
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Modifier un conducteur",
+          "name": "Modifier",
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nom\": \"El Hiloufi\",\n  \"prenom\": \"Mouad\",\n  \"email\": \"mouad.elhiloufi@youcode.ma\",\n  \"telephone\": \"0600000001\",\n  \"numeroPermis\": \"PERMIS-001\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"El Hiloufi\",\n  \"prenom\": \"Mouad\",\n  \"email\": \"mouad.elhiloufi@youcode.ma\",\n  \"telephone\": \"0600000001\",\n  \"numeroPermis\": \"PERMIS-001\"\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/conducteurs/{{conducteurId}}"
           }
         }
@@ -101,65 +44,26 @@
     },
     {
       "name": "Passagers",
-      "description": "Gestion des passagers.",
       "item": [
         {
-          "name": "Creer un passager",
+          "name": "Creer",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Sara\",\n  \"email\": \"sara.alaoui@example.com\",\n  \"telephone\": \"0600000002\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Sara\",\n  \"email\": \"sara.alaoui@example.com\",\n  \"telephone\": \"0600000002\"\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/passagers"
           },
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test(\"Code HTTP 201\", function () { pm.response.to.have.status(201); });",
-                "const body = pm.response.json();",
-                "pm.collectionVariables.set(\"passagerId\", body.id);"
-              ]
-            }
-          }]
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if (r.id) pm.collectionVariables.set(\"passagerId\", r.id);"] } }]
         },
+        { "name": "Lister", "request": { "method": "GET", "url": "{{baseUrl}}/api/passagers?page=0&size=10&sort=nom,asc" } },
+        { "name": "Obtenir", "request": { "method": "GET", "url": "{{baseUrl}}/api/passagers/{{passagerId}}" } },
+        { "name": "Rechercher", "request": { "method": "GET", "url": "{{baseUrl}}/api/passagers/search?q=Sara&page=0&size=10" } },
         {
-          "name": "Lister les passagers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/passagers?page=0&size=10&sort=nom,asc"
-          }
-        },
-        {
-          "name": "Obtenir un passager",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/passagers/{{passagerId}}"
-          }
-        },
-        {
-          "name": "Rechercher des passagers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/passagers/search?q=Sara&page=0&size=10"
-          }
-        },
-        {
-          "name": "Modifier un passager",
+          "name": "Modifier",
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Sara\",\n  \"email\": \"sara.alaoui@youcode.ma\",\n  \"telephone\": \"0600000002\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Sara\",\n  \"email\": \"sara.alaoui@youcode.ma\",\n  \"telephone\": \"0600000002\"\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/passagers/{{passagerId}}"
           }
         }
@@ -167,77 +71,86 @@
     },
     {
       "name": "Vehicules",
-      "description": "Gestion des vehicules. La creation exige un conducteur existant.",
       "item": [
         {
-          "name": "Ajouter un vehicule",
+          "name": "Ajouter",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"marque\": \"Renault\",\n  \"modele\": \"Clio\",\n  \"immatriculation\": \"1234-A-1\",\n  \"couleur\": \"Bleu\",\n  \"capacite\": 4,\n  \"conducteurId\": {{conducteurId}}\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Renault\",\n  \"modele\": \"Clio\",\n  \"immatriculation\": \"1234-A-1\",\n  \"couleur\": \"Bleu\",\n  \"capacite\": 4,\n  \"conducteurId\": {{conducteurId}}\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/vehicules"
           },
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test(\"Code HTTP 201\", function () { pm.response.to.have.status(201); });",
-                "const body = pm.response.json();",
-                "pm.collectionVariables.set(\"vehiculeId\", body.id);"
-              ]
-            }
-          }]
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if (r.id) pm.collectionVariables.set(\"vehiculeId\", r.id);"] } }]
         },
+        { "name": "Obtenir", "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}" } },
+        { "name": "Lister par conducteur", "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/conducteur/{{conducteurId}}" } },
         {
-          "name": "Obtenir un vehicule",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}"
-          }
-        },
-        {
-          "name": "Lister les vehicules d'un conducteur",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/vehicules/conducteur/{{conducteurId}}"
-          }
-        },
-        {
-          "name": "Modifier un vehicule",
+          "name": "Modifier",
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"marque\": \"Renault\",\n  \"modele\": \"Clio 5\",\n  \"immatriculation\": \"1234-A-1\",\n  \"couleur\": \"Noir\",\n  \"capacite\": 5,\n  \"conducteurId\": {{conducteurId}}\n}",
-              "options": { "raw": { "language": "json" } }
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Renault\",\n  \"modele\": \"Clio 5\",\n  \"immatriculation\": \"1234-A-1\",\n  \"couleur\": \"Noir\",\n  \"capacite\": 5,\n  \"conducteurId\": {{conducteurId}}\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}"
           }
         },
+        { "name": "Supprimer", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}?conducteurId={{conducteurId}}" } }
+      ]
+    },
+    {
+      "name": "Trajets",
+      "item": [
         {
-          "name": "Supprimer un vehicule",
+          "name": "Publier",
           "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/vehicules/{{vehiculeId}}?conducteurId={{conducteurId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "vehicules", "{{vehiculeId}}"],
-              "query": [{ "key": "conducteurId", "value": "{{conducteurId}}" }]
-            }
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"conducteurId\": {{conducteurId}},\n  \"vehiculeId\": {{vehiculeId}},\n  \"placesProposees\": 4,\n  \"pointsArret\": [\n    { \"ville\": \"Casablanca\", \"ordre\": 0, \"heurePassage\": \"2026-12-20T08:00:00\", \"prixDepuisDepart\": 0.00 },\n    { \"ville\": \"Settat\", \"ordre\": 1, \"heurePassage\": \"2026-12-20T09:00:00\", \"prixDepuisDepart\": 30.00 },\n    { \"ville\": \"Marrakech\", \"ordre\": 2, \"heurePassage\": \"2026-12-20T12:00:00\", \"prixDepuisDepart\": 80.00 }\n  ]\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/trajets"
           },
-          "event": [{
-            "listen": "test",
-            "script": { "exec": ["pm.test(\"Code HTTP 204\", function () { pm.response.to.have.status(204); });"] }
-          }]
-        }
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if (r.id) pm.collectionVariables.set(\"trajetId\", r.id);"] } }]
+        },
+        { "name": "Obtenir les details", "request": { "method": "GET", "url": "{{baseUrl}}/api/trajets/{{trajetId}}" } },
+        { "name": "Lister par conducteur", "request": { "method": "GET", "url": "{{baseUrl}}/api/trajets/conducteur/{{conducteurId}}" } },
+        {
+          "name": "Rechercher",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/search?villeDepart=Casablanca&villeArrivee=Marrakech&date=2026-12-20&prixMax=100&nbPlaces=1&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "trajets", "search"],
+              "query": [
+                { "key": "villeDepart", "value": "Casablanca" },
+                { "key": "villeArrivee", "value": "Marrakech" },
+                { "key": "date", "value": "2026-12-20" },
+                { "key": "prixMax", "value": "100" },
+                { "key": "nbPlaces", "value": "1" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        { "name": "Rechercher sans prix maximum", "request": { "method": "GET", "url": "{{baseUrl}}/api/trajets/search?villeDepart=Casablanca&villeArrivee=Settat&date=2026-12-20&nbPlaces=2&page=0&size=10" } },
+        { "name": "Terminer un trajet", "request": { "method": "PATCH", "url": "{{baseUrl}}/api/trajets/{{trajetId}}/terminer?conducteurId={{conducteurId}}" } },
+        { "name": "Annuler un trajet", "request": { "method": "PATCH", "url": "{{baseUrl}}/api/trajets/{{trajetId}}/annuler?conducteurId={{conducteurId}}" } }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Creer une reservation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"passagerId\": {{passagerId}},\n  \"trajetId\": {{trajetId}},\n  \"pointMonteeId\": {{pointMonteeId}},\n  \"pointDescenteId\": {{pointDescenteId}},\n  \"nombrePlaces\": 1\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/reservations"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if (r.id) pm.collectionVariables.set(\"reservationId\", r.id);"] } }]
+        },
+        { "name": "Annuler une reservation", "request": { "method": "PATCH", "url": "{{baseUrl}}/api/reservations/{{reservationId}}/annuler?passagerId={{passagerId}}" } },
+        { "name": "Lister les reservations d'un passager", "request": { "method": "GET", "url": "{{baseUrl}}/api/reservations/passager/{{passagerId}}" } }
       ]
     }
   ]
